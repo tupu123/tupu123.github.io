@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极简搜索页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 15vh;
+        }
+        /* 时间日期样式 */
+        .time-box {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        #time {
+            font-size: 60px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        #date {
+            font-size: 20px;
+            color: #666;
+        }
+        /* 搜索框样式 */
+        .search-box {
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+        }
+        #kw {
+            flex: 1;
+            height: 50px;
+            padding: 0 20px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 25px 0 0 25px;
+            outline: none;
+        }
+        #kw:focus {
+            border-color: #409eff;
+        }
+        .search-btn {
+            height: 50px;
+            padding: 0 30px;
+            background-color: #409eff;
+            color: #fff;
+            border: none;
+            border-radius: 0 25px 25px 0;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- 时间日期 -->
+    <div class="time-box">
+        <div id="time"></div>
+        <div id="date"></div>
+    </div>
+
+    <!-- 百度搜索框 -->
+    <form action="https://www.baidu.com/s" method="get" class="search-box">
+        <input type="text" name="wd" id="kw" placeholder="输入内容搜索百度">
+        <button type="submit" class="search-btn">搜索</button>
+    </form>
+
+    <script>
+        // 实时更新时间日期
+        function updateTime() {
+            const now = new Date();
+            // 时间：时:分:秒
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('time').innerText = `${hours}:${minutes}:${seconds}`;
+
+            // 日期：年-月-日 星期X
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const weekArr = ['周日','周一','周二','周三','周四','周五','周六'];
+            const week = weekArr[now.getDay()];
+            document.getElementById('date').innerText = `${year}年${month}月${day}日 ${week}`;
+        }
+
+        // 初始执行 + 每秒刷新
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
