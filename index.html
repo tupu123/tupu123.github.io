@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <title>GO!</title>
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="white"/><path d="M12 48V16C12 12 16 10 20 10h24c4 0 8 2 8 6v32Z" fill="none" stroke="%232c2c2c" stroke-width="3"/><line x1="32" y1="14" x2="32" y2="44" stroke="%232c2c2c"/><circle cx="32" cy="34" r="6" fill="none" stroke="%232c2c2c"/><line x1="32" y1="28" x2="32" y2="40" stroke="%232c2c2c"/><line x1="26" y1="34" x2="38" y2="34" stroke="%232c2c2c"/><polygon points="32,14 38,18 32,22" fill="%232c2c2c"/></svg>' />
-
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -127,6 +126,9 @@
   <div class="poetry-block"><div class="poetry-text" id="poemLine">—— 诗意向晚 ——</div></div>
 </div>
 
+<!-- 今日诗词官方SDK -->
+<script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
+
 <script>
   // ==================== 和风天气配置（使用您的专属域名） ====================
   const MY_API_HOST = 'https://na6yw2gd3y.re.qweatherapi.com';
@@ -157,37 +159,6 @@
   };
   function getWeatherEmoji(code) { return weatherIconMap[String(code)] || '🍃'; }
 
-  // ======================= 诗词库 =======================
-  const poemLibrary = [
-    "春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少。",
-    "人间四月芳菲尽，山寺桃花始盛开。长恨春归无觅处，不知转入此中来。",
-    "明月松间照，清泉石上流。竹喧归浣女，莲动下渔舟。",
-    "采菊东篱下，悠然见南山。山气日夕佳，飞鸟相与还。",
-    "海内存知己，天涯若比邻。无为在歧路，儿女共沾巾。",
-    "会当凌绝顶，一览众山小。造化钟神秀，阴阳割昏晓。",
-    "长风破浪会有时，直挂云帆济沧海。",
-    "月上柳梢头，人约黄昏后。",
-    "云想衣裳花想容，春风拂槛露华浓。",
-    "山重水复疑无路，柳暗花明又一村。",
-    "夜阑卧听风吹雨，铁马冰河入梦来。",
-    "无可奈何花落去，似曾相识燕归来。",
-    "欲穷千里目，更上一层楼。",
-    "小荷才露尖尖角，早有蜻蜓立上头。",
-    "停车坐爱枫林晚，霜叶红于二月花。",
-    "孤舟蓑笠翁，独钓寒江雪。",
-    "竹外桃花三两枝，春江水暖鸭先知。",
-    "草长莺飞二月天，拂堤杨柳醉春烟。",
-    "黄梅时节家家雨，青草池塘处处蛙。",
-    "忽如一夜春风来，千树万树梨花开。",
-    "日出江花红胜火，春来江水绿如蓝。",
-    "两岸猿声啼不住，轻舟已过万重山。",
-    "野旷天低树，江清月近人。",
-    "星垂平野阔，月涌大江流。",
-    "白日依山尽，黄河入海流。",
-    "千山鸟飞绝，万径人踪灭。",
-    "相看两不厌，只有敬亭山。"
-  ];
-
   // ========== 1. 时钟 ==========
   function updateClockAndDate() {
     const now = new Date();
@@ -201,17 +172,20 @@
   setInterval(updateClockAndDate, 1000);
   updateClockAndDate();
 
-  // ========== 2. 诗词 ==========
-  let currentPoemIdx = Math.floor(Math.random() * poemLibrary.length);
+  // ========== 2. 今日诗词（jinrishici.com） ==========
+  const poemEl = document.getElementById('poemLine');
+  
   function refreshPoem() {
-    const poemEl = document.getElementById('poemLine');
-    let newIdx = Math.floor(Math.random() * poemLibrary.length);
-    if (newIdx === currentPoemIdx) newIdx = (newIdx + 1) % poemLibrary.length;
-    currentPoemIdx = newIdx;
     poemEl.style.opacity = '0.4';
-    setTimeout(() => { poemEl.innerText = poemLibrary[currentPoemIdx]; poemEl.style.opacity = '1'; }, 120);
+    jinrishici.load(result => {
+      poemEl.innerText = result.data.content;
+      poemEl.style.opacity = '1';
+    });
   }
-  document.getElementById('poemLine').innerText = poemLibrary[currentPoemIdx];
+
+  // 初始化加载诗词
+  refreshPoem();
+  // 每50分钟自动刷新
   setInterval(refreshPoem, 50 * 60 * 1000);
   
   // ========== 3. 天气功能 ==========
@@ -226,7 +200,6 @@
   function setWeatherLoading(loading) {
     document.getElementById('weatherWidget').classList[loading ? 'add' : 'remove']('weather-loading');
   }
-
   // 城市搜索（GeoAPI）
   async function searchCitySuggestions(keyword) {
     if (!keyword || keyword.length < 1) {
@@ -254,7 +227,6 @@
       suggestionsDiv.style.display = 'none';
     }
   }
-
   window.selectCity = function(cityName, locationId) {
     currentCity = cityName;
     currentLocationId = locationId;
@@ -264,7 +236,6 @@
     exitEditMode(cityName);
     getWeather();
   };
-
   function enterEditMode() {
     if (isEditing) return;
     isEditing = true;
@@ -299,7 +270,6 @@
       if (e.key === 'Escape') exitEditMode(currentCity);
     });
   }
-
   function exitEditMode(inputValue) {
     isEditing = false;
     suggestionsDiv.style.display = 'none';
@@ -321,7 +291,6 @@
       locationDisplay.innerText = '点击输入城市';
     }
   }
-
   // 获取实时天气
   async function getWeather() {
     if (!currentCity) {
@@ -397,7 +366,6 @@
       setWeatherLoading(false);
     }
   }
-
   window.refreshWeather = function() {
     if (currentCity) {
       getWeather();
@@ -463,11 +431,10 @@
     locationDisplay.innerText = currentCity;
     getWeather();
   } else {
-    // 默认设置为北京
     currentCity = '北京';
     currentLocationId = '101010100';
     localStorage.setItem('qweather_city', currentCity);
-    localStorage.setItem('qweather_location_id', currentLocationId);
+    localStorage.setItem('qweather_location_id', locationId);
     locationDisplay.innerText = currentCity;
     getWeather();
   }
