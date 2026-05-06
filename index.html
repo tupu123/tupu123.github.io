@@ -128,12 +128,12 @@
 </div>
 
 <script>
-  // ==================== 和风天气配置 ====================
-  const QWEATHER_KEY = '93d3ffa7628d4d6aa31deb616c4fd06a';
+  // ==================== 和风天气配置（使用您的专属域名） ====================
+  const MY_API_HOST = 'https://na6yw2gd3y.re.qweatherapi.com';
+  const MY_API_KEY = '93d3ffa7628d4d6aa31deb616c4fd06a';
   
-  // 使用官方API主机
-  const GEO_API = 'https://geoapi.qweather.com/v2/city/lookup';
-  const WEATHER_API = 'https://api.qweather.com/v7/weather/now';
+  const GEO_API = `${MY_API_HOST}/geo/v2/city/lookup`;
+  const WEATHER_API = `${MY_API_HOST}/v7/weather/now`;
   
   let currentCity = localStorage.getItem('qweather_city') || '';
   let currentLocationId = localStorage.getItem('qweather_location_id') || '';
@@ -234,7 +234,7 @@
       return;
     }
     try {
-      const url = `${GEO_API}?location=${encodeURIComponent(keyword)}&key=${QWEATHER_KEY}`;
+      const url = `${GEO_API}?location=${encodeURIComponent(keyword)}&key=${MY_API_KEY}`;
       const res = await fetch(url);
       const data = await res.json();
       
@@ -322,7 +322,7 @@
     }
   }
 
-  // 获取实时天气（Weather API）
+  // 获取实时天气
   async function getWeather() {
     if (!currentCity) {
       locationDisplay.innerText = '点击输入城市';
@@ -338,9 +338,8 @@
     try {
       let locationId = currentLocationId;
       
-      // 如果没有LocationID，先通过GeoAPI获取
       if (!locationId) {
-        const searchUrl = `${GEO_API}?location=${encodeURIComponent(currentCity)}&key=${QWEATHER_KEY}`;
+        const searchUrl = `${GEO_API}?location=${encodeURIComponent(currentCity)}&key=${MY_API_KEY}`;
         const searchRes = await fetch(searchUrl);
         const searchData = await searchRes.json();
         
@@ -357,8 +356,7 @@
         }
       }
       
-      // 获取实时天气
-      const weatherUrl = `${WEATHER_API}?location=${locationId}&key=${QWEATHER_KEY}`;
+      const weatherUrl = `${WEATHER_API}?location=${locationId}&key=${MY_API_KEY}`;
       const weatherRes = await fetch(weatherUrl);
       const weatherData = await weatherRes.json();
       
@@ -460,8 +458,16 @@
     searchInput.setAttribute('autocomplete', 'off');
   }
   
-  // 初始化
+  // 初始化：如果有保存的城市就加载天气，否则默认显示北京
   if (currentCity) {
+    locationDisplay.innerText = currentCity;
+    getWeather();
+  } else {
+    // 默认设置为北京
+    currentCity = '北京';
+    currentLocationId = '101010100';
+    localStorage.setItem('qweather_city', currentCity);
+    localStorage.setItem('qweather_location_id', currentLocationId);
     locationDisplay.innerText = currentCity;
     getWeather();
   }
