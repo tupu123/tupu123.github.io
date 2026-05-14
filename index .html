@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>起始页</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://sdk.jinrishici.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/qweather-icons@1.3.0/font/qweather-icons.css">
+<style>
+  :root {
+    --bg-gradient-start: #e2e9f0;
+    --bg-gradient-end: #c5ced9;
+    --glass-bg: rgba(245, 250, 240, 0.3);
+    --glass-card-bg: rgba(255, 255, 252, 0.88);
+    --text-primary: #2c4a3b;
+    --text-secondary: #3a5a48;
+    --accent-light: #9bc47c;
+    --accent-soft: rgba(155, 196, 124, 0.25);
+    --border-light: rgba(210, 225, 190, 0.7);
+    --shadow-sm: 0 10px 24px rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 32px 56px rgba(0, 0, 0, 0.08);
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    --radius-lg: 56px;
+    --radius-md: 40px;
+    --radius-sm: 20px;
+  }
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  
+  body {
+    height: 100vh; width: 100vw; overflow: hidden;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: radial-gradient(circle at 20% 30%, var(--bg-gradient-start), var(--bg-gradient-end));
+    display: flex; align-items: center; justify-content: center; padding: 20px; position: relative;
+  }
+  
+  body::before {
+    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: radial-gradient(circle at 30% 45%, rgba(210, 225, 200, 0.25) 1.2px, transparent 1px),
+                      radial-gradient(circle at 70% 60%, rgba(180, 200, 160, 0.18) 1px, transparent 1px);
+    background-size: 48px 48px, 32px 32px; background-position: 0 0, 20px 30px;
+    pointer-events: none; z-index: 0;
+  }
+  
+  body::after {
+    content: ""; position: fixed; top: 10%; right: -8%; width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(180, 210, 150, 0.3), rgba(160, 190, 130, 0));
+    border-radius: 50%; filter: blur(70px); pointer-events: none; z-index: 0;
+  }
+  
+  .bg-orb-left {
+    position: fixed; bottom: -5%; left: -10%; width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(170, 210, 140, 0.25), rgba(140, 180, 110, 0));
+    border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0;
+  }
+  
+  .glass-panel {
+    width: 100%; max-width: 800px; height: auto; max-height: 92vh;
+    background: var(--glass-bg); backdrop-filter: blur(24px) saturate(180%);
+    border-radius: 64px; border: 1px solid rgba(255, 255, 245, 0.65);
+    box-shadow: var(--shadow-md), inset 0 1px 0.6px rgba(255, 255, 245, 0.8);
+    padding: 34px 32px 44px; display: flex; flex-direction: column; justify-content: center;
+    overflow-y: auto; scrollbar-width: none; position: relative; z-index: 2;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .glass-panel::-webkit-scrollbar { display: none; }
+  
+  .glass-card {
+    background: var(--glass-card-bg); backdrop-filter: blur(14px);
+    border-radius: var(--radius-lg); border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,240,0.9);
+    transition: transform var(--transition-normal), background var(--transition-fast), box-shadow var(--transition-fast);
+    will-change: transform;
+  }
+  
+  .glass-card:hover { transform: translateY(-2px); background: rgba(255, 255, 252, 0.94); }
+  
+  .time-block { margin-bottom: 24px; padding: 20px 30px; display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .time-main { display: flex; align-items: baseline; gap: 4px; }
+  .time-digits { font-size: 78px; font-weight: 620; letter-spacing: 6px; line-height: 1.1; background: linear-gradient(135deg, #2c4a3b, #4a7058); background-clip: text; -webkit-background-clip: text; color: transparent; }
+  .seconds-pill { font-size: 19px; font-weight: 500; background: rgba(200, 220, 175, 0.5); backdrop-filter: blur(6px); padding: 6px 16px; border-radius: 60px; color: #3a684a; border: 0.2px solid rgba(170, 200, 140, 0.6); display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; margin-left: 12px; }
+  .date-lotus { font-size: 17px; font-weight: 500; color: var(--text-secondary); background: rgba(220, 238, 200, 0.65); padding: 8px 22px; border-radius: 100px; backdrop-filter: blur(4px); letter-spacing: 0.8px; border: 0.2px solid rgba(190, 215, 160, 0.6); }
+  
+  .search-block { margin-bottom: 24px; }
+  .search-form { position: relative; display: flex; align-items: center; width: 100%; }
+  .search-input { width: 100%; padding: 18px 100px 18px 34px; font-size: 17px; background: rgba(255, 255, 245, 0.96); border: 1px solid rgba(185, 210, 155, 0.7); border-radius: 100px; outline: none; color: #2a4236; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
+  .search-input:focus { background: #fff; border-color: var(--accent-light); box-shadow: 0 6px 16px rgba(100, 140, 70, 0.12), 0 0 0 3px rgba(155, 196, 124, 0.35); }
+  .search-input::placeholder { color: #8aa97b; }
+  .search-btn { position: absolute; right: 10px; height: 50px; padding: 0 32px; border-radius: 100px; border: none; background: var(--accent-soft); backdrop-filter: blur(8px); font-size: 15px; font-weight: 580; color: #356e3a; cursor: pointer; transition: transform var(--transition-fast), background var(--transition-fast); }
+  .search-btn:hover { background: rgba(130, 175, 100, 0.45); transform: scale(0.96); }
+  
+  .weather-block { margin-bottom: 24px; padding: 20px 28px; cursor: pointer; transition: transform var(--transition-fast), background var(--transition-fast); }
+  .weather-main-row { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+  .weather-icon { font-size: 3rem; color: #4a7058; line-height: 1; transition: transform var(--transition-normal); }
+  .weather-temp { font-size: 60px; font-weight: 640; line-height: 1; color: #2a4a3a; }
+  .weather-temp small { font-size: 28px; font-weight: 500; }
+  .weather-desc { font-size: 20px; font-weight: 520; background: rgba(225, 240, 205, 0.7); backdrop-filter: blur(4px); padding: 6px 22px; border-radius: 60px; color: #426a50; border: 0.3px solid rgba(190, 215, 160, 0.6); }
+  .weather-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(140, 170, 110, 0.2); }
+  .weather-location { display: flex; align-items: center; gap: 6px; font-size: 14px; background: rgba(225, 240, 205, 0.6); padding: 5px 16px; border-radius: var(--radius-md); color: #3a6048; position: relative; cursor: pointer; transition: background var(--transition-fast); }
+  .weather-location:hover { background: rgba(210, 230, 185, 0.8); }
+  .location-edit { cursor: pointer; font-size: 12px; opacity: 0.6; margin-left: 4px; transition: opacity var(--transition-fast); }
+  .location-edit:hover { opacity: 1; }
+  .location-input { background: rgba(255, 255, 245, 0.98); border: 1px solid var(--accent-light); border-radius: var(--radius-md); padding: 4px 12px; font-size: 13px; outline: none; width: 130px; color: #2a4236; transition: all var(--transition-fast); }
+  .weather-update { font-size: 12px; background: rgba(225, 240, 205, 0.6); padding: 5px 16px; border-radius: var(--radius-md); opacity: 0.8; color: #497a59; cursor: pointer; transition: transform var(--transition-fast), background var(--transition-fast); }
+  .weather-update:hover { background: rgba(190, 215, 160, 0.8); opacity: 1; transform: scale(0.96); }
+  .city-suggestions { position: absolute; bottom: 100%; left: 0; right: 0; background: rgba(255, 255, 245, 0.98); backdrop-filter: blur(16px); border-radius: var(--radius-sm); margin-bottom: 8px; padding: 6px 0; z-index: 100; box-shadow: 0 8px 20px rgba(0,0,0,0.12); border: 1px solid rgba(185, 210, 155, 0.5); max-height: 200px; overflow-y: auto; }
+  .suggestion-item { padding: 8px 16px; cursor: pointer; font-size: 13px; color: var(--text-primary); transition: background 0.15s, transform 0.1s; }
+  .suggestion-item:hover { background: rgba(155, 196, 124, 0.2); transform: translateX(4px); }
+  
+  .poetry-block { padding: 18px 26px; background: var(--glass-card-bg); backdrop-filter: blur(14px); border-radius: var(--radius-lg); border: 1px solid var(--border-light); transition: transform 0.2s ease, background 0.2s; cursor: pointer; will-change: transform; }
+  .poetry-block:active { transform: scale(0.98); }
+  .poetry-text { font-size: 16px; line-height: 1.55; text-align: center; color: var(--text-primary); letter-spacing: 0.5px; transition: opacity 0.2s; }
+  
+  .weather-loading .weather-icon { animation: subtlePulse 1.2s ease-in-out infinite; }
+  @keyframes subtlePulse { 0% { opacity: 0.6; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0.6; transform: scale(0.98); } }
+  
+  .icon-spin { animation: spin 0.6s ease-out; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  
+  .poem-shine { animation: poemFlash 0.3s ease-out; }
+  @keyframes poemFlash { 0% { background: rgba(225, 245, 200, 0.5); transform: scale(0.98); } 100% { background: var(--glass-card-bg); transform: scale(1); } }
+  
+  @media (max-width: 768px) {
+    .glass-panel { padding: 26px 22px 34px; }
+    .time-digits { font-size: 58px; letter-spacing: 4px; }
+    .seconds-pill { font-size: 15px; }
+    .weather-icon { font-size: 2.2rem; }
+    .weather-temp { font-size: 46px; }
+    .weather-temp small { font-size: 24px; }
+    .weather-desc { font-size: 16px; }
+    .location-input { width: 110px; font-size: 12px; }
+  }
+  
+  @media (min-width: 1024px) {
+    .glass-panel { max-width: 880px; padding: 42px 48px 52px; }
+    .time-digits { font-size: 96px; }
+    .weather-icon { font-size: 3.8rem; }
+    .weather-temp { font-size: 72px; }
+    .location-input { width: 150px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="bg-orb-left"></div>
+<div class="glass-panel">
+  <div class="time-block glass-card">
+    <div class="time-main"><span class="time-digits" id="clockDisplay">--:--</span><span class="seconds-pill" id="secondsDisplay">--</span></div>
+    <div class="date-lotus" id="dateDisplay">--/-- 星期—</div>
+  </div>
+  <div class="search-block glass-card">
+    <form class="search-form" id="searchForm" autocomplete="off">
+      <input type="text" id="searchInput" class="search-input" placeholder="搜索诗句、知识、万物 ···" autofocus autocomplete="off" />
+      <button type="submit" class="search-btn" id="searchBtn">搜 索</button>
+    </form>
+  </div>
+  <div class="weather-block glass-card" id="weatherWidget">
+    <div class="weather-main-row">
+      <i class="weather-icon" id="weatherIcon"></i>
+      <span class="weather-temp" id="weatherTemp">--<small>°C</small></span>
+      <span class="weather-desc" id="weatherDesc">请输入城市</span>
+    </div>
+    <div class="weather-meta">
+      <div class="weather-location" id="locationContainer">
+        <span>📍</span><span id="locationDisplay" class="location-display">点击输入城市</span><span class="location-edit" id="locationEditBtn" title="修改城市">✎</span>
+        <div id="citySuggestions" class="city-suggestions" style="display: none;"></div>
+      </div>
+      <div class="weather-update" id="weatherUpdate">⏱️ 点击刷新</div>
+    </div>
+  </div>
+  <div class="poetry-block" id="poetryBlock"><div class="poetry-text" id="poemLine">—— 诗意向晚 ——</div></div>
+</div>
+
+<script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8" async defer></script>
+
+<script>
+// ==================== 重构版：模块化架构 ====================
+(function() {
+  'use strict';
+
+  // ---------- 1. 配置模块 (config.js) ----------
+  const CONFIG = {
+    WEATHER: {
+      HOST: 'https://na6yw2gd3y.re.qweatherapi.com',
+      KEY: '93d3ffa7628d4d6aa31deb616c4fd06a',
+      TIMEOUT: 8000,
+      CACHE_TTL: 20 * 60 * 1000,
+      MAX_RETRIES: 2
+    },
+    UI: {
+      POEM_MIN_INTERVAL: 30 * 60 * 1000,
+      POEM_MAX_INTERVAL: 60 * 60 * 1000,
+      WEATHER_THROTTLE: 1500,
+      POEM_RETRY_DELAY: 5000,    // 5秒后重试
+      POEM_MAX_RETRIES: 3,
+      CITY_SUGGESTION_LIMIT: 6
+    },
+    DEFAULT_CITY: { name: '济南', id: '101120101' },
+    FALLBACK_POEMS: [
+      '—— 诗意向晚，岁月静好 ——',
+      '—— 清风徐来，水波不兴 ——',
+      '—— 行到水穷处，坐看云起时 ——',
+      '—— 竹杖芒鞋轻胜马 ——',
+      '—— 一蓑烟雨任平生 ——'
+    ]
+  };
+
+  // ---------- 2. 工具模块 (utils.js) ----------
+  const Utils = {
+    pad: (n) => n.toString().padStart(2, '0'),
+    
+    storage: {
+      get(key, defaultValue = '') {
+        try { return localStorage.getItem(key) ?? defaultValue; } catch { return defaultValue; }
+      },
+      set(key, value) {
+        try { localStorage.setItem(key, value); } catch (e) { console.warn(e); }
+      },
+      remove(key) { try { localStorage.removeItem(key); } catch(e) {} }
+    },
+    
+    // 内存缓存层（优化频繁localStorage读写）
+    memoryCache: new Map(),
+    
+    cache: {
+      get(key, ttl = null) {
+        const entry = Utils.memoryCache.get(key);
+        if (!entry) return null;
+        if (ttl && Date.now() - entry.timestamp > ttl) {
+          Utils.memoryCache.delete(key);
+          return null;
+        }
+        return entry.data;
+      },
+      set(key, data) {
+        Utils.memoryCache.set(key, { data, timestamp: Date.now() });
+      },
+      clear() { Utils.memoryCache.clear(); }
+    },
+    
+    async fetchJSON(url, timeout = CONFIG.WEATHER.TIMEOUT, retries = CONFIG.WEATHER.MAX_RETRIES) {
+      for (let i = 0; i <= retries; i++) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), timeout);
+          const response = await fetch(url, { signal: controller.signal });
+          clearTimeout(timeoutId);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return await response.json();
+        } catch (err) {
+          if (i === retries) throw err;
+          await new Promise(r => setTimeout(r, 500 * (i + 1)));
+        }
+      }
+      throw new Error('All retries failed');
+    },
+    
+    throttle(fn, delay) {
+      let lastCall = 0, timer = null;
+      return (...args) => {
+        const now = Date.now();
+        if (now - lastCall >= delay) {
+          if (timer) { clearTimeout(timer); timer = null; }
+          lastCall = now;
+          fn(...args);
+        } else if (!timer) {
+          timer = setTimeout(() => {
+            lastCall = Date.now();
+            fn(...args);
+            timer = null;
+          }, delay - (now - lastCall));
+        }
+      };
+    },
+    
+    debounce(fn, delay) {
+      let timer = null;
+      return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delay);
+      };
+    },
+    
+    randomInterval(min, max) {
+      return Math.floor(Math.random() * (max - min + 1) + min);
+    },
+    
+    weatherCache: {
+      get(cityId) {
+        const cached = Utils.cache.get(`weather_${cityId}`, CONFIG.WEATHER.CACHE_TTL);
+        if (cached) return cached;
+        try {
+          const stored = localStorage.getItem(`weather_${cityId}`);
+          if (!stored) return null;
+          const { data, timestamp } = JSON.parse(stored);
+          if (Date.now() - timestamp < CONFIG.WEATHER.CACHE_TTL) {
+            Utils.cache.set(`weather_${cityId}`, data);
+            return data;
+          }
+          localStorage.removeItem(`weather_${cityId}`);
+          return null;
+        } catch { return null; }
+      },
+      set(cityId, data) {
+        Utils.cache.set(`weather_${cityId}`, data);
+        try {
+          localStorage.setItem(`weather_${cityId}`, JSON.stringify({ data, timestamp: Date.now() }));
+        } catch(e) {}
+      }
+    }
+  };
+
+  // ---------- 3. DOM 元素引用 ----------
+  const DOM = {
+    clock: document.getElementById('clockDisplay'),
+    seconds: document.getElementById('secondsDisplay'),
+    date: document.getElementById('dateDisplay'),
+    poem: document.getElementById('poemLine'),
+    poetryBlock: document.getElementById('poetryBlock'),
+    weatherIcon: document.getElementById('weatherIcon'),
+    weatherTemp: document.getElementById('weatherTemp'),
+    weatherDesc: document.getElementById('weatherDesc'),
+    weatherUpdate: document.getElementById('weatherUpdate'),
+    weatherWidget: document.getElementById('weatherWidget'),
+    locationDisplay: document.getElementById('locationDisplay'),
+    locationContainer: document.getElementById('locationContainer'),
+    locationEditBtn: document.getElementById('locationEditBtn'),
+    citySuggestions: document.getElementById('citySuggestions'),
+    searchInput: document.getElementById('searchInput'),
+    searchForm: document.getElementById('searchForm')
+  };
+
+  // ---------- 4. 天气图标映射 ----------
+  const WeatherIconMap = new Map([
+    ['100','qi-100'],['101','qi-101'],['102','qi-102'],['103','qi-103'],['104','qi-104'],
+    ['300','qi-300'],['301','qi-301'],['302','qi-302'],['303','qi-303'],['304','qi-304'],
+    ['305','qi-305'],['306','qi-306'],['307','qi-307'],['308','qi-308'],['309','qi-309'],
+    ['310','qi-310'],['311','qi-311'],['312','qi-312'],['313','qi-313'],['314','qi-314'],
+    ['315','qi-315'],['316','qi-316'],['317','qi-317'],['318','qi-318'],['399','qi-399'],
+    ['400','qi-400'],['401','qi-401'],['402','qi-402'],['403','qi-403'],['404','qi-404'],
+    ['405','qi-405'],['406','qi-406'],['407','qi-407'],['408','qi-408'],['409','qi-409'],
+    ['410','qi-410'],['499','qi-499'],['500','qi-500'],['501','qi-501'],['502','qi-502'],
+    ['503','qi-503'],['504','qi-504'],['507','qi-507'],['508','qi-508'],['509','qi-509'],
+    ['510','qi-510'],['511','qi-511'],['512','qi-512'],['513','qi-513'],['514','qi-514'],
+    ['515','qi-515'],['900','qi-900']
+  ]);
+  const getWeatherIconClass = (code) => WeatherIconMap.get(String(code)) || `qi-${code}`;
+
+  // ---------- 5. 统一状态管理 (setState 模式) ----------
+  const AppState = {
+    // 数据状态
+    data: {
+      city: '',
+      locationId: '',
+      weatherData: null,
+      poemText: '—— 诗意向晚 ——',
+      currentTime: new Date()
+    },
+    // UI状态
+    ui: {
+      isEditingCity: false,
+      isLoadingWeather: false,
+      poemFailedCount: 0,
+      poemRetryTimer: null
+    },
+    // 资源句柄
+    handles: {
+      animationFrameId: null,
+      poemTimerId: null,
+      visibilityHandler: null,
+      beforeUnloadHandler: null
+    },
+    lastSecond: -1,
+    
+    // 统一更新入口
+    setState(updater) {
+      const newState = typeof updater === 'function' ? updater(this.data, this.ui) : updater;
+      if (newState.data) Object.assign(this.data, newState.data);
+      if (newState.ui) Object.assign(this.ui, newState.ui);
+      this.notifyView();
+    },
+    
+    // 视图更新函数（数据驱动）
+    notifyView() {
+      this.updateClockView();
+      this.updatePoemView();
+      this.updateWeatherView();
+    },
+    
+    updateClockView() {
+      const now = this.data.currentTime;
+      const currentSec = now.getSeconds();
+      if (currentSec !== this.lastSecond) {
+        this.lastSecond = currentSec;
+        DOM.clock.textContent = `${Utils.pad(now.getHours())}:${Utils.pad(now.getMinutes())}`;
+        DOM.seconds.textContent = Utils.pad(currentSec);
+        const month = Utils.pad(now.getMonth() + 1);
+        const day = Utils.pad(now.getDate());
+        const weekday = now.toLocaleDateString('zh-CN', { weekday: 'short' }).replace('周', '星期');
+        DOM.date.textContent = `${month}/${day} ${weekday}`;
+      }
+    },
+    
+    updatePoemView() {
+      DOM.poem.textContent = this.data.poemText;
+    },
+    
+    updateWeatherView() {
+      DOM.locationDisplay.textContent = this.data.city || '点击输入城市';
+      
+      if (this.ui.isLoadingWeather) {
+        DOM.weatherWidget.classList.add('weather-loading');
+      } else {
+        DOM.weatherWidget.classList.remove('weather-loading');
+      }
+      
+      if (this.data.weatherData) {
+        const w = this.data.weatherData;
+        DOM.weatherTemp.innerHTML = `${Math.round(parseFloat(w.temp))}<small>°C</small>`;
+        DOM.weatherDesc.textContent = w.text || '未知';
+        this.setWeatherIcon(w.icon);
+        
+        const nowTime = new Date();
+        const timeStr = `${Utils.pad(nowTime.getHours())}:${Utils.pad(nowTime.getMinutes())}`;
+        let extra = "";
+        if (w.humidity) extra += `💧${w.humidity}% `;
+        if (w.windSpeed) extra += `🍃${Math.round(parseFloat(w.windSpeed))}km/h`;
+        DOM.weatherUpdate.textContent = `⏱️ ${timeStr} ${extra ? `· ${extra.trim()}` : "· 正好风来"}`;
+      } else if (this.data.city) {
+        DOM.weatherTemp.innerHTML = '--<small>°C</small>';
+        DOM.weatherDesc.textContent = '加载中...';
+      }
+    },
+    
+    setWeatherIcon(code) {
+      DOM.weatherIcon.className = `weather-icon ${getWeatherIconClass(code)}`;
+      DOM.weatherIcon.style.opacity = '1';
+      DOM.weatherIcon.classList.add('icon-spin');
+      setTimeout(() => DOM.weatherIcon.classList.remove('icon-spin'), 600);
+    },
+    
+    setPlaceholderIcon() {
+      DOM.weatherIcon.className = 'weather-icon qi-999';
+      DOM.weatherIcon.style.opacity = '0.5';
+    }
+  };
+
+  // ---------- 6. 时钟模块 (clock.js) ----------
+  const ClockModule = {
+    start() {
+      if (AppState.handles.animationFrameId) {
+        cancelAnimationFrame(AppState.handles.animationFrameId);
+      }
+      AppState.lastSecond = -1;
+      this._updateLoop();
+    },
+    
+    _updateLoop() {
+      AppState.data.currentTime = new Date();
+      AppState.notifyView();
+      AppState.handles.animationFrameId = requestAnimationFrame(() => this._updateLoop());
+    },
+    
+    stop() {
+      if (AppState.handles.animationFrameId) {
+        cancelAnimationFrame(AppState.handles.animationFrameId);
+        AppState.handles.animationFrameId = null;
+      }
+    }
+  };
+
+  // ---------- 7. 诗词模块 (poem.js) - 带重试机制 ----------
+  const PoemModule = {
+    async fetchPoem() {
+      // 等待SDK加载（最多3秒）
+      const maxWait = 3000;
+      const startTime = Date.now();
+      while (typeof jinrishici === 'undefined' && Date.now() - startTime < maxWait) {
+        await new Promise(r => setTimeout(r, 100));
+      }
+      
+      if (typeof jinrishici === 'undefined') {
+        throw new Error('诗词SDK加载失败');
+      }
+      
+      return new Promise((resolve, reject) => {
+        const timeoutId = setTimeout(() => reject(new Error('诗词API超时')), 5000);
+        
+        try {
+          jinrishici.load(
+            result => {
+              clearTimeout(timeoutId);
+              if (result?.data?.content) {
+                resolve(result.data.content);
+              } else {
+                reject(new Error('无效诗词数据'));
+              }
+            },
+            err => {
+              clearTimeout(timeoutId);
+              reject(err);
+            }
+          );
+        } catch (e) {
+          clearTimeout(timeoutId);
+          reject(e);
+        }
+      });
+    },
+    
+    async refreshWithRetry() {
+      DOM.poetryBlock.classList.add('poem-shine');
+      
+      try {
+        const poem = await this.fetchPoem();
+        // 成功：重置失败计数
+        AppState.ui.poemFailedCount = 0;
+        AppState.setState({ data: { poemText: poem } });
+      } catch (err) {
+        console.warn('诗词获取失败:', err);
+        const newCount = AppState.ui.poemFailedCount + 1;
+        AppState.ui.poemFailedCount = newCount;
+        
+        // 使用降级诗句
+        const fallbackIndex = Math.min(newCount - 1, CONFIG.FALLBACK_POEMS.length - 1);
+        const fallbackPoem = CONFIG.FALLBACK_POEMS[fallbackIndex] || CONFIG.FALLBACK_POEMS[0];
+        AppState.setState({ data: { poemText: fallbackPoem } });
+        
+        // 如果未超过最大重试次数，安排重试
+        if (newCount < CONFIG.UI.POEM_MAX_RETRIES) {
+          if (AppState.ui.poemRetryTimer) clearTimeout(AppState.ui.poemRetryTimer);
+          AppState.ui.poemRetryTimer = setTimeout(() => {
+            this.refreshWithRetry();
+          }, CONFIG.UI.POEM_RETRY_DELAY);
+        }
+      } finally {
+        setTimeout(() => DOM.poetryBlock.classList.remove('poem-shine'), 300);
+        this.scheduleNext();
+      }
+    },
+    
+    scheduleNext() {
+      if (AppState.handles.poemTimerId) clearTimeout(AppState.handles.poemTimerId);
+      const nextInterval = Utils.randomInterval(CONFIG.UI.POEM_MIN_INTERVAL, CONFIG.UI.POEM_MAX_INTERVAL);
+      AppState.handles.poemTimerId = setTimeout(() => {
+        if (!document.hidden) {
+          this.refreshWithRetry();
+        } else {
+          this.scheduleNext(); // 隐藏时推迟
+        }
+      }, nextInterval);
+    },
+    
+    async init() {
+      await this.refreshWithRetry();
+      DOM.poetryBlock.addEventListener('click', () => this.refreshWithRetry());
+    },
+    
+    cleanup() {
+      if (AppState.handles.poemTimerId) {
+        clearTimeout(AppState.handles.poemTimerId);
+        AppState.handles.poemTimerId = null;
+      }
+      if (AppState.ui.poemRetryTimer) {
+        clearTimeout(AppState.ui.poemRetryTimer);
+        AppState.ui.poemRetryTimer = null;
+      }
+    }
+  };
+
+  // ---------- 8. 天气模块 (weather.js) ----------
+  const getGeoApi = () => `${CONFIG.WEATHER.HOST}/geo/v2/city/lookup`;
+  const getWeatherApi = () => `${CONFIG.WEATHER.HOST}/v7/weather/now`;
+  
+  const WeatherModule = {
+    async fetchWeather(force = false) {
+      if (AppState.ui.isLoadingWeather) return;
+      if (!AppState.data.city) {
+        AppState.setPlaceholderIcon();
+        return;
+      }
+      
+      AppState.ui.isLoadingWeather = true;
+      AppState.notifyView();
+      
+      try {
+        let locationId = AppState.data.locationId;
+        
+        // 获取城市ID
+        if (!locationId) {
+          const searchUrl = `${getGeoApi()}?location=${encodeURIComponent(AppState.data.city)}&key=${CONFIG.WEATHER.KEY}`;
+          const searchData = await Utils.fetchJSON(searchUrl);
+          if (searchData.code === '200' && searchData.location?.length) {
+            const loc = searchData.location[0];
+            locationId = loc.id;
+            Utils.storage.set('qweather_location_id', locationId);
+            AppState.setState({ data: { city: loc.name, locationId } });
+          } else {
+            throw new Error(`未找到城市"${AppState.data.city}"`);
+          }
+        }
+        
+        let weatherData = null;
+        if (!force) weatherData = Utils.weatherCache.get(locationId);
+        
+        if (!weatherData) {
+          const weatherUrl = `${getWeatherApi()}?location=${locationId}&key=${CONFIG.WEATHER.KEY}`;
+          weatherData = await Utils.fetchJSON(weatherUrl);
+          if (weatherData.code === '200' && weatherData.now) {
+            Utils.weatherCache.set(locationId, weatherData);
+          } else {
+            throw new Error(`API错误: ${weatherData.code}`);
+          }
+        }
+        
+        AppState.setState({ data: { weatherData: weatherData.now } });
+        
+      } catch (err) {
+        console.error('天气获取失败:', err);
+        const errorMsg = err.name === 'AbortError' ? '请求超时' : err.message.substring(0, 30);
+        DOM.weatherUpdate.textContent = `⏱️ ${errorMsg}`;
+        AppState.setPlaceholderIcon();
+      } finally {
+        AppState.ui.isLoadingWeather = false;
+        AppState.notifyView();
+      }
+    },
+    
+    throttledRefresh: Utils.throttle(() => WeatherModule.fetchWeather(true), CONFIG.UI.WEATHER_THROTTLE),
+    
+    async updateCity(cityName, locationId = '') {
+      if (cityName && cityName !== AppState.data.city) {
+        AppState.setState({ data: { city: cityName, locationId, weatherData: null } });
+        Utils.storage.set('qweather_city', cityName);
+        if (locationId) Utils.storage.set('qweather_location_id', locationId);
+        else Utils.storage.remove('qweather_location_id');
+        await this.fetchWeather(false);
+      }
+    },
+    
+    initCityFromStorage() {
+      let savedCity = Utils.storage.get('qweather_city', '');
+      let savedId = Utils.storage.get('qweather_location_id', '');
+      if (!savedCity) {
+        savedCity = CONFIG.DEFAULT_CITY.name;
+        savedId = CONFIG.DEFAULT_CITY.id;
+        Utils.storage.set('qweather_city', savedCity);
+        Utils.storage.set('qweather_location_id', savedId);
+      }
+      AppState.data.city = savedCity;
+      AppState.data.locationId = savedId;
+      AppState.notifyView();
+    }
+  };
+
+  // ---------- 9. 城市编辑UI模块 ----------
+  const CityEditModule = {
+    debouncedSearch: null,
+    
+    init() {
+      this.debouncedSearch = Utils.debounce(async (keyword) => {
+        if (!keyword || keyword.length < 1) {
+          DOM.citySuggestions.style.display = 'none';
+          return;
+        }
+        try {
+          const url = `${getGeoApi()}?location=${encodeURIComponent(keyword)}&key=${CONFIG.WEATHER.KEY}`;
+          const data = await Utils.fetchJSON(url);
+          if (data.code === '200' && data.location?.length) {
+            const locations = data.location.slice(0, CONFIG.UI.CITY_SUGGESTION_LIMIT);
+            DOM.citySuggestions.style.display = 'block';
+            DOM.citySuggestions.innerHTML = locations.map(loc => 
+              `<div class="suggestion-item" data-name="${loc.name}" data-id="${loc.id}">${loc.name}${loc.adm1 ? ` · ${loc.adm1}` : ''}</div>`
+            ).join('');
+          } else {
+            DOM.citySuggestions.style.display = 'none';
+          }
+        } catch {
+          DOM.citySuggestions.style.display = 'none';
+        }
+      }, 400);
+      
+      this.bindEvents();
+    },
+    
+    enterEditMode() {
+      if (AppState.ui.isEditingCity) return;
+      AppState.ui.isEditingCity = true;
+      
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'location-input';
+      input.value = AppState.data.city;
+      input.placeholder = '输入城市名';
+      DOM.locationDisplay.style.display = 'none';
+      DOM.locationContainer.insertBefore(input, DOM.locationEditBtn);
+      input.focus();
+      
+      const handleInput = (e) => this.debouncedSearch(e.target.value.trim());
+      input.addEventListener('input', handleInput);
+      
+      const exitHandler = () => this.exitEditMode(input.value);
+      input.addEventListener('blur', () => setTimeout(exitHandler, 200));
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.exitEditMode(input.value);
+          WeatherModule.fetchWeather(false);
+        }
+        if (e.key === 'Escape') this.exitEditMode(AppState.data.city);
+      });
+    },
+    
+    exitEditMode(inputValue) {
+      AppState.ui.isEditingCity = false;
+      DOM.citySuggestions.style.display = 'none';
+      const input = DOM.locationContainer.querySelector('.location-input');
+      if (input) input.remove();
+      DOM.locationDisplay.style.display = 'inline';
+      
+      if (inputValue?.trim() && inputValue.trim() !== AppState.data.city) {
+        WeatherModule.updateCity(inputValue.trim(), '');
+      }
+    },
+    
+    bindEvents() {
+      DOM.locationEditBtn.addEventListener('click', (e) => { e.stopPropagation(); this.enterEditMode(); });
+      DOM.locationDisplay.addEventListener('click', (e) => { e.stopPropagation(); this.enterEditMode(); });
+      DOM.weatherWidget.addEventListener('click', (e) => {
+        if (e.target.closest('#locationEditBtn') || e.target.closest('.location-input') || e.target.closest('.suggestion-item')) return;
+        if (!e.target.closest('#weatherUpdate')) WeatherModule.throttledRefresh();
+      });
+      DOM.weatherUpdate.addEventListener('click', (e) => { e.stopPropagation(); WeatherModule.throttledRefresh(); });
+      
+      DOM.citySuggestions.addEventListener('click', (e) => {
+        const item = e.target.closest('.suggestion-item');
+        if (!item) return;
+        const cityName = item.dataset.name, locationId = item.dataset.id;
+        if (cityName && locationId) {
+          DOM.citySuggestions.style.display = 'none';
+          this.exitEditMode(cityName);
+          WeatherModule.updateCity(cityName, locationId);
+        }
+      });
+      
+      document.addEventListener('click', (e) => {
+        if (!DOM.locationContainer.contains(e.target)) {
+          DOM.citySuggestions.style.display = 'none';
+        }
+      });
+    }
+  };
+
+  // ---------- 10. 搜索模块 (search.js) ----------
+  const SearchModule = {
+    init() {
+      DOM.searchForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const query = DOM.searchInput.value.trim();
+        if (!query) {
+          PoemModule.refreshWithRetry();
+          DOM.searchInput.placeholder = "✨ 寻一抹诗意 ✨";
+          setTimeout(() => {
+            if (DOM.searchInput.placeholder === "✨ 寻一抹诗意 ✨") {
+              DOM.searchInput.placeholder = "搜索诗句、知识、万物 ···";
+            }
+          }, 1500);
+          return;
+        }
+        window.open(`https://www.baidu.com/s?wd=${encodeURIComponent(query)}`, '_blank');
+      });
+      DOM.searchInput.addEventListener('focus', (e) => e.target.select());
+    }
+  };
+
+  // ---------- 11. 可见性API模块 ----------
+  const VisibilityModule = {
+    init() {
+      AppState.handles.visibilityHandler = () => {
+        if (document.hidden) {
+          ClockModule.stop();
+          if (AppState.handles.poemTimerId) {
+            clearTimeout(AppState.handles.poemTimerId);
+            AppState.handles.poemTimerId = null;
+          }
+        } else {
+          ClockModule.start();
+          if (AppState.handles.poemTimerId) clearTimeout(AppState.handles.poemTimerId);
+          PoemModule.scheduleNext();
+          WeatherModule.fetchWeather(false);
+        }
+      };
+      document.addEventListener('visibilitychange', AppState.handles.visibilityHandler);
+    },
+    
+    cleanup() {
+      if (AppState.handles.visibilityHandler) {
+        document.removeEventListener('visibilitychange', AppState.handles.visibilityHandler);
+        AppState.handles.visibilityHandler = null;
+      }
+    }
+  };
+
+  // ---------- 12. 启动与清理 ----------
+  function cleanupAll() {
+    ClockModule.stop();
+    PoemModule.cleanup();
+    VisibilityModule.cleanup();
+    if (AppState.handles.beforeUnloadHandler) {
+      window.removeEventListener('beforeunload', AppState.handles.beforeUnloadHandler);
+    }
+  }
+  
+  async function init() {
+    WeatherModule.initCityFromStorage();
+    ClockModule.start();
+    await PoemModule.init();
+    CityEditModule.init();
+    SearchModule.init();
+    VisibilityModule.init();
+    await WeatherModule.fetchWeather(false);
+    
+    AppState.handles.beforeUnloadHandler = () => cleanupAll();
+    window.addEventListener('beforeunload', AppState.handles.beforeUnloadHandler);
+  }
+  
+  init();
+})();
+</script>
+</body>
+</html>
